@@ -160,3 +160,5 @@ will see any new errors that way, and updated the import statements in App.jsx. 
 at this point, i will just build the webassembly module again and make sure wasm-pack is installed to avoid drama again: `curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh`
 
 `cd frontend/src/wasm && wasm-pack build --target web && mkdir -p ../../public/wasm && cp -r pkg/* ../../public/wasm/`
+
+`cd /mnt/c/projects/nsisonglabs/options-pricing-visualizer/frontend/src/wasm && wasm-pack build --target web && mkdir -p ../../public/wasm && cp -r pkg/* ../../public/wasm/`
