@@ -11,7 +11,7 @@ export default defineConfig({
     }
   },
   optimizeDeps: {
-    exclude: ['**/options_pricing_wasm_bg.wasm']
+    exclude: ['**/*.wasm']
   },
   build: {
     target: 'esnext'
@@ -19,7 +19,7 @@ export default defineConfig({
   assetsInclude: ['**/*.wasm'],
   resolve: {
     alias: {
-      '@wasm': '/wasm'
+      '@wasm': '/src/wasm-pkg'
     }
   }
 });

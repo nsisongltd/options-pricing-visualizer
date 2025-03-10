@@ -1,0 +1,15 @@
+{
+  "name": "options-pricing-wasm",
+  "type": "module",
+  "version": "0.1.0",
+  "files": [
+    "options_pricing_wasm_bg.wasm",
+    "options_pricing_wasm.js",
+    "options_pricing_wasm.d.ts"
+  ],
+  "main": "options_pricing_wasm.js",
+  "types": "options_pricing_wasm.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}

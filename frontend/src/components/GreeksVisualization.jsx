@@ -25,8 +25,7 @@ function GreeksVisualization({ params }) {
   useEffect(() => {
     const initWasm = async () => {
       try {
-        const wasmUrl = '/wasm/options_pricing_wasm.js';
-        const { default: init, calculate_option_price } = await import(/* @vite-ignore */ wasmUrl);
+        const { default: init, calculate_option_price } = await import('../wasm-pkg/options_pricing_wasm.js');
         await init();
         setWasmModule({ calculate_option_price });
         calculateGreeks();
