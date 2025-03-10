@@ -18,6 +18,11 @@ app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.json());
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', message: 'Server is running' });
+});
+
 // Database setup
 const db = new sqlite3.Database(path.join(__dirname, '../../database/options.db'), (err) => {
   if (err) {
