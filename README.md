@@ -128,3 +128,9 @@ Option chains
 Implied volatility surface
 Portfolio analysis
 Risk metrics
+
+# okay, rants
+
+- I tried to setup the app components to include the auth and protected routes in app.jsx
+- i also made sure the navbar.js component now has the logout functionality, before i forget t
+- the problem has been with npm, the package.json file shii, so i finally found a way now, i will just add the new dependencies.
