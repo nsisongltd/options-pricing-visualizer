@@ -12,6 +12,8 @@ import { styled } from '@mui/material/styles';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import CalculateIcon from '@mui/icons-material/Calculate';
 import TimelineIcon from '@mui/icons-material/Timeline';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { useAuth } from '../contexts/AuthContext';
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   display: 'flex',
@@ -28,6 +30,12 @@ const NavButton = styled(Button)(({ theme }) => ({
 }));
 
 function Navbar() {
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+  };
+
   return (
     <AppBar position="static">
       <StyledToolbar>
@@ -36,7 +44,7 @@ function Navbar() {
             Options Pricing Visualizer
           </Typography>
         </Box>
-        <Box>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <NavButton
             component={RouterLink}
             to="/"
@@ -58,6 +66,13 @@ function Navbar() {
           >
             Visualization
           </NavButton>
+          <IconButton
+            color="inherit"
+            onClick={handleLogout}
+            sx={{ ml: 2 }}
+          >
+            <LogoutIcon />
+          </IconButton>
         </Box>
       </StyledToolbar>
     </AppBar>

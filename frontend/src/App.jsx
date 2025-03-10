@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 import { Container, Box, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Visualization from './components/Visualization';
 import GreeksVisualization from './components/GreeksVisualization';
 import HistoricalDataVisualization from './components/HistoricalDataVisualization';
 import Navbar from './components/Navbar';
+import Login from './components/auth/Login';
+import Register from './components/auth/Register';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 const theme = createTheme({
   palette: {
@@ -21,7 +25,31 @@ const theme = createTheme({
   },
 });
 
-function App() {
+function ProtectedRoute({ children }) {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
+
+  return children;
+}
+
+function AuthPage() {
+  const [isLogin, setIsLogin] = useState(true);
+
+  return isLogin ? (
+    <Login onToggleForm={() => setIsLogin(false)} />
+  ) : (
+    <Register onToggleForm={() => setIsLogin(true)} />
+  );
+}
+
+function Dashboard() {
   const [params, setParams] = useState({
     spotPrice: 100,
     strikePrice: 100,
@@ -32,16 +60,38 @@ function App() {
   });
 
   return (
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 4, flex: 1 }}>
+      <Visualization params={params} onParamsChange={setParams} />
+      <GreeksVisualization params={params} />
+      <HistoricalDataVisualization params={params} />
+    </Container>
+  );
+}
+
+function App() {
+  return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-        <Navbar />
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4, flex: 1 }}>
-          <Visualization params={params} onParamsChange={setParams} />
-          <GreeksVisualization params={params} />
-          <HistoricalDataVisualization params={params} />
-        </Container>
-      </Box>
+      <AuthProvider>
+        <Router>
+          <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+            <Routes>
+              <Route path="/login" element={<AuthPage />} />
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <>
+                      <Navbar />
+                      <Dashboard />
+                    </>
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </Box>
+        </Router>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

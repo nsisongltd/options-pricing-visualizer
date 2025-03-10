@@ -116,7 +116,9 @@ Interactive visualization of option prices vs strike prices
 Greeks visualization (Delta, Gamma, Theta, Vega)
 Backend API with SQLite database
 Frontend API service for data fetching
-
+Added a historical data visualization component that shows option prices over time
+Added a sample data generation and database seeding
+Made smooth integration with the existing visualization components
 
 # Considering doing this next:
 Add historical data visualization

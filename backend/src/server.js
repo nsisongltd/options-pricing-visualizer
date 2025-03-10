@@ -4,10 +4,13 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 5000;
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
 // Middleware
 app.use(cors());
@@ -28,6 +31,15 @@ const db = new sqlite3.Database(path.join(__dirname, '../../database/options.db'
 // Initialize database tables
 function initializeDatabase() {
   db.serialize(() => {
+    // Users table
+    db.run(`CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      email TEXT UNIQUE NOT NULL,
+      password TEXT NOT NULL,
+      name TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    )`);
+
     // Historical options data table
     db.run(`CREATE TABLE IF NOT EXISTS historical_data (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -43,7 +55,7 @@ function initializeDatabase() {
     // User preferences table
     db.run(`CREATE TABLE IF NOT EXISTS user_preferences (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id TEXT NOT NULL,
+      user_id INTEGER NOT NULL,
       default_spot_price REAL,
       default_strike_price REAL,
       default_time_to_expiry REAL,
@@ -51,95 +63,101 @@ function initializeDatabase() {
       default_risk_free_rate REAL,
       default_option_type TEXT,
       created_at TEXT NOT NULL,
-      updated_at TEXT NOT NULL
+      updated_at TEXT NOT NULL,
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    )`);
+
+    // User calculations table
+    db.run(`CREATE TABLE IF NOT EXISTS user_calculations (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      spot_price REAL NOT NULL,
+      strike_price REAL NOT NULL,
+      time_to_expiry REAL NOT NULL,
+      volatility REAL NOT NULL,
+      risk_free_rate REAL NOT NULL,
+      option_type TEXT NOT NULL,
+      calculated_price REAL NOT NULL,
+      created_at TEXT NOT NULL,
+      FOREIGN KEY (user_id) REFERENCES users(id)
     )`);
   });
 }
 
-// Routes
-app.post('/api/calculations', (req, res) => {
-  const {
-    spot_price,
-    strike_price,
-    time_to_expiry,
-    volatility,
-    risk_free_rate,
-    option_type,
-    calculated_price,
-  } = req.body;
+// Authentication middleware
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
 
-  const sql = `
-    INSERT INTO calculations (
-      spot_price,
-      strike_price,
-      time_to_expiry,
-      volatility,
-      risk_free_rate,
-      option_type,
-      calculated_price
-    ) VALUES (?, ?, ?, ?, ?, ?, ?)
-  `;
+  if (!token) {
+    return res.status(401).json({ error: 'Access token required' });
+  }
 
-  db.run(
-    sql,
-    [
-      spot_price,
-      strike_price,
-      time_to_expiry,
-      volatility,
-      risk_free_rate,
-      option_type,
-      calculated_price,
-    ],
-    function (err) {
-      if (err) {
-        console.error('Error saving calculation:', err);
-        res.status(500).json({ error: 'Failed to save calculation' });
-        return;
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.status(403).json({ error: 'Invalid token' });
+    }
+    req.user = user;
+    next();
+  });
+};
+
+// Auth routes
+app.post('/api/auth/register', async (req, res) => {
+  const { email, password, name } = req.body;
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const now = new Date().toISOString();
+
+    db.run(
+      'INSERT INTO users (email, password, name, created_at) VALUES (?, ?, ?, ?)',
+      [email, hashedPassword, name, now],
+      function(err) {
+        if (err) {
+          if (err.message.includes('UNIQUE constraint failed')) {
+            return res.status(400).json({ error: 'Email already exists' });
+          }
+          return res.status(500).json({ error: 'Error creating user' });
+        }
+        res.status(201).json({ id: this.lastID, message: 'User created successfully' });
       }
-      res.status(201).json({
-        id: this.lastID,
-        message: 'Calculation saved successfully',
-      });
-    }
-  );
+    );
+  } catch (error) {
+    res.status(500).json({ error: 'Error creating user' });
+  }
 });
 
-app.get('/api/calculations', (req, res) => {
-  const sql = 'SELECT * FROM calculations ORDER BY created_at DESC LIMIT 10';
-  db.all(sql, [], (err, rows) => {
+app.post('/api/auth/login', (req, res) => {
+  const { email, password } = req.body;
+
+  db.get('SELECT * FROM users WHERE email = ?', [email], async (err, user) => {
     if (err) {
-      console.error('Error fetching calculations:', err);
-      res.status(500).json({ error: 'Failed to fetch calculations' });
-      return;
+      return res.status(500).json({ error: 'Error logging in' });
     }
-    res.json(rows);
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    try {
+      const validPassword = await bcrypt.compare(password, user.password);
+      if (!validPassword) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
+
+      const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET);
+      res.json({ token, user: { id: user.id, email: user.email, name: user.name } });
+    } catch (error) {
+      res.status(500).json({ error: 'Error logging in' });
+    }
   });
 });
 
-app.get('/api/historical-data', (req, res) => {
-  const { symbol, startDate, endDate } = req.query;
-  const query = `
-    SELECT * FROM historical_data 
-    WHERE symbol = ? 
-    AND timestamp BETWEEN ? AND ?
-    ORDER BY timestamp DESC
-  `;
-  
-  db.all(query, [symbol, startDate, endDate], (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.json(rows);
-  });
-});
-
-app.get('/api/user-preferences/:userId', (req, res) => {
-  const { userId } = req.params;
+// Protected routes
+app.get('/api/user/preferences', authenticateToken, (req, res) => {
   const query = 'SELECT * FROM user_preferences WHERE user_id = ?';
   
-  db.get(query, [userId], (err, row) => {
+  db.get(query, [req.user.id], (err, row) => {
     if (err) {
       res.status(500).json({ error: err.message });
       return;
@@ -148,8 +166,7 @@ app.get('/api/user-preferences/:userId', (req, res) => {
   });
 });
 
-app.post('/api/user-preferences/:userId', (req, res) => {
-  const { userId } = req.params;
+app.post('/api/user/preferences', authenticateToken, (req, res) => {
   const preferences = req.body;
   const now = new Date().toISOString();
   
@@ -163,7 +180,7 @@ app.post('/api/user-preferences/:userId', (req, res) => {
   db.run(
     query,
     [
-      userId,
+      req.user.id,
       preferences.spotPrice,
       preferences.strikePrice,
       preferences.timeToExpiry,
@@ -181,6 +198,90 @@ app.post('/api/user-preferences/:userId', (req, res) => {
       res.json({ id: this.lastID });
     }
   );
+});
+
+app.post('/api/calculations', authenticateToken, (req, res) => {
+  const {
+    spot_price,
+    strike_price,
+    time_to_expiry,
+    volatility,
+    risk_free_rate,
+    option_type,
+    calculated_price,
+  } = req.body;
+
+  const now = new Date().toISOString();
+  const sql = `
+    INSERT INTO user_calculations (
+      user_id,
+      spot_price,
+      strike_price,
+      time_to_expiry,
+      volatility,
+      risk_free_rate,
+      option_type,
+      calculated_price,
+      created_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  db.run(
+    sql,
+    [
+      req.user.id,
+      spot_price,
+      strike_price,
+      time_to_expiry,
+      volatility,
+      risk_free_rate,
+      option_type,
+      calculated_price,
+      now,
+    ],
+    function (err) {
+      if (err) {
+        console.error('Error saving calculation:', err);
+        res.status(500).json({ error: 'Failed to save calculation' });
+        return;
+      }
+      res.status(201).json({
+        id: this.lastID,
+        message: 'Calculation saved successfully',
+      });
+    }
+  );
+});
+
+app.get('/api/calculations', authenticateToken, (req, res) => {
+  const sql = 'SELECT * FROM user_calculations WHERE user_id = ? ORDER BY created_at DESC LIMIT 10';
+  db.all(sql, [req.user.id], (err, rows) => {
+    if (err) {
+      console.error('Error fetching calculations:', err);
+      res.status(500).json({ error: 'Failed to fetch calculations' });
+      return;
+    }
+    res.json(rows);
+  });
+});
+
+// Public routes
+app.get('/api/historical-data', (req, res) => {
+  const { symbol, startDate, endDate } = req.query;
+  const query = `
+    SELECT * FROM historical_data 
+    WHERE symbol = ? 
+    AND timestamp BETWEEN ? AND ?
+    ORDER BY timestamp DESC
+  `;
+  
+  db.all(query, [symbol, startDate, endDate], (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json(rows);
+  });
 });
 
 // Error handling middleware
