@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Container, Box, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import Visualization from './components/Visualization';
 import GreeksVisualization from './components/GreeksVisualization';
+import HistoricalDataVisualization from './components/HistoricalDataVisualization';
 import Navbar from './components/Navbar';
 
 const theme = createTheme({
@@ -38,6 +39,7 @@ function App() {
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4, flex: 1 }}>
           <Visualization params={params} onParamsChange={setParams} />
           <GreeksVisualization params={params} />
+          <HistoricalDataVisualization params={params} />
         </Container>
       </Box>
     </ThemeProvider>
