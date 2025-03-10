@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Paper,
@@ -10,8 +10,12 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  CircularProgress,
+  Alert,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { calculateOptionPrice } from '../utils/wasmLoader';
+import axios from 'axios';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(3),
@@ -36,6 +40,8 @@ function OptionsCalculator() {
   });
 
   const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -46,10 +52,42 @@ function OptionsCalculator() {
   };
 
   const handleCalculate = async () => {
-    // TODO: Implement WebAssembly calculation
-    // This is a placeholder for the actual calculation
-    const calculatedPrice = 0.0; // Replace with actual calculation
-    setResult(calculatedPrice);
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Validate inputs
+      const values = Object.values(formData);
+      if (values.some((value) => value === '')) {
+        throw new Error('Please fill in all fields');
+      }
+
+      // Convert string values to numbers
+      const params = {
+        spotPrice: parseFloat(formData.spotPrice),
+        strikePrice: parseFloat(formData.strikePrice),
+        timeToExpiry: parseFloat(formData.timeToExpiry),
+        volatility: parseFloat(formData.volatility),
+        riskFreeRate: parseFloat(formData.riskFreeRate),
+        optionType: formData.optionType,
+      };
+
+      // Calculate option price using WebAssembly
+      const calculatedPrice = await calculateOptionPrice(params);
+
+      // Save calculation to backend
+      await axios.post('http://localhost:5000/api/calculations', {
+        ...params,
+        calculated_price: calculatedPrice,
+      });
+
+      setResult(calculatedPrice);
+    } catch (err) {
+      setError(err.message || 'An error occurred during calculation');
+      console.error('Calculation error:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -67,6 +105,7 @@ function OptionsCalculator() {
               type="number"
               value={formData.spotPrice}
               onChange={handleChange}
+              disabled={loading}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -77,6 +116,7 @@ function OptionsCalculator() {
               type="number"
               value={formData.strikePrice}
               onChange={handleChange}
+              disabled={loading}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -87,6 +127,7 @@ function OptionsCalculator() {
               type="number"
               value={formData.timeToExpiry}
               onChange={handleChange}
+              disabled={loading}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -97,6 +138,7 @@ function OptionsCalculator() {
               type="number"
               value={formData.volatility}
               onChange={handleChange}
+              disabled={loading}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -107,6 +149,7 @@ function OptionsCalculator() {
               type="number"
               value={formData.riskFreeRate}
               onChange={handleChange}
+              disabled={loading}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -117,6 +160,7 @@ function OptionsCalculator() {
                 value={formData.optionType}
                 onChange={handleChange}
                 label="Option Type"
+                disabled={loading}
               >
                 <MenuItem value="call">Call</MenuItem>
                 <MenuItem value="put">Put</MenuItem>
@@ -129,12 +173,19 @@ function OptionsCalculator() {
               color="primary"
               onClick={handleCalculate}
               fullWidth
+              disabled={loading}
             >
-              Calculate
+              {loading ? <CircularProgress size={24} /> : 'Calculate'}
             </Button>
           </Grid>
         </Grid>
       </StyledPaper>
+
+      {error && (
+        <Alert severity="error" sx={{ mt: 2 }}>
+          {error}
+        </Alert>
+      )}
 
       {result !== null && (
         <ResultBox>
