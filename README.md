@@ -107,3 +107,22 @@ Start the development servers:
 The application will be available at:
 Frontend: http://localhost:3000
 Backend: http://localhost:5000
+
+
+# So far, what i have done:
+
+WASM implementation for fast options pricing calculations
+Interactive visualization of option prices vs strike prices
+Greeks visualization (Delta, Gamma, Theta, Vega)
+Backend API with SQLite database
+Frontend API service for data fetching
+
+
+# Considering doing this next:
+Add historical data visualization
+Implement user authentication
+Add more advanced features like:
+Option chains
+Implied volatility surface
+Portfolio analysis
+Risk metrics
