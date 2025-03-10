@@ -135,3 +135,9 @@ app.get('/api/health', (req, res) => {
 });
 ```
 
+let me check the frontend api config again, might have made mistakes. but this looks good, God abeg!
+
+```bash
+pkill -f "node src/server.js" && pkill -f "vite"
+```
+
