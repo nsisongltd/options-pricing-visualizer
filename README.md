@@ -134,3 +134,33 @@ Risk metrics
 - I tried to setup the app components to include the auth and protected routes in app.jsx
 - i also made sure the navbar.js component now has the logout functionality, before i forget t
 - the problem has been with npm, the package.json file shii, so i finally found a way now, i will just add the new dependencies.
+- since i won't be sharing the setup.sh file, i updated it with the jwt secret key
+- since i have implemented the user auth and components, i want to run a quick test. 
+- common sense would ask that you do something like `JWT_SECRET=$(openssl rand -base64 32)`
+
+## For the Backend, I have fixed:
+✅ Server setup with Express
+✅ Database setup with SQLite
+✅ Authentication routes (login/register)
+✅ Protected routes for user preferences and calculations
+✅ JWT authentication middleware
+✅ Error handling
+
+## For the Frontend, I have fixed:
+✅ Authentication context and provider
+✅ Login and Register components
+✅ Protected routes
+✅ API service for backend communication
+✅ Navbar with logout functionality
+✅ Main App component with routing
+
+## As for Dependencies,  I have this now:
+✅ Backend dependencies (express, bcrypt, jwt, etc.)
+✅ Frontend dependencies (react, mui, d3, etc.)
+Configuration:
+✅ Environment variables setup
+✅ Database initialization
+✅ API endpoints configuration
+The only thing I am thinking of adding now is a loading state component to improve the user experience during authentication checks. Maybe I should just add that then.
+
+Okay, if i add a loadingspinner.js script, would have to update the protected route component again. i need to stop!
