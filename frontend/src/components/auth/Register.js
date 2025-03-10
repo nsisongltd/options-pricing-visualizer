@@ -8,7 +8,7 @@ import {
   Link,
   Alert,
 } from '@mui/material';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext.jsx';
 
 function Register({ onToggleForm }) {
   const [name, setName] = useState('');
