@@ -170,3 +170,5 @@ I think this issue is because I was trying to import the webassembly file direct
 `cd frontend && mkdir -p src/wasm`
 
 Wo! I Created a new directory src/wasm-pkg and moved the WebAssembly files there. Then, Updated the Vite configuration to use the new wasm location jeje and excluded all .wasm files from optimization jare. It should all point to the new location.
+
+I need to join work meeting, right now.
