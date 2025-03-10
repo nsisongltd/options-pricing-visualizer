@@ -164,3 +164,7 @@ at this point, i will just build the webassembly module again and make sure wasm
 `cd /mnt/c/projects/nsisonglabs/options-pricing-visualizer/frontend/src/wasm && wasm-pack build --target web && mkdir -p ../../public/wasm && cp -r pkg/* ../../public/wasm/`
 
 with the way this is stressing me, i had to use my other macbook to load shii `pkill -f "vite" && cd frontend && npm run dev -- --host`
+
+I think this issue is because I was trying to import the webassembly file directly from the `/public` directory o, and vite does not even allow it. omooor. i will just move the wasm files to the src directory and update the imports again.
+
+`cd frontend && mkdir -p src/wasm`

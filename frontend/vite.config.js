@@ -5,19 +5,28 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: true, // Listen on all network interfaces
-    port: 5173  // Use a consistent port
+    port: 5173,  // Use a consistent port
+    proxy: {
+      '/api': 'http://localhost:5000'
+    }
   },
   optimizeDeps: {
-    exclude: ['/wasm/options_pricing_wasm.js']
+    exclude: ['options_pricing_wasm']
   },
   build: {
     target: 'esnext',
     rollupOptions: {
       output: {
         manualChunks: {
-          wasm: ['/wasm/options_pricing_wasm.js']
+          wasm: ['options_pricing_wasm']
         }
       }
+    }
+  },
+  assetsInclude: ['**/*.wasm'],
+  resolve: {
+    alias: {
+      '@wasm': '/wasm'
     }
   }
 });
