@@ -151,3 +151,8 @@ i think i know what is wrong.  let me fix the error in the frontend/src/contexts
 having done that, let me update any imports that reference thi file atleast, make ah see clear. also, maybe other parts of the project even uses the shii. oh, navbar.js uses it sef, as well as login.js and register.js, this makes sense.
 
 okay, fine. all fixed. let me restart all now: `pkill -f "vite" && cd frontend && npm run dev`
+
+the loading spinner i added is even causing problems, irrelevant feature o. 
+let me just rename all the component files then: `cd frontend/src/components && mv LoadingSpinner.js LoadingSpinner.jsx && mv Navbar.js Navbar.jsx && mv GreeksVisualization.js GreeksVisualization.jsx && mv HistoricalDataVisualization.js HistoricalDataVisualization.jsx && cd auth && mv Login.js Login.jsx && mv Register.js Register.jsx`
+
+will see any new errors that way, and updated the import statements in App.jsx

@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Container, Box, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Visualization from './components/Visualization';
-import GreeksVisualization from './components/GreeksVisualization';
-import HistoricalDataVisualization from './components/HistoricalDataVisualization';
-import Navbar from './components/Navbar';
-import Login from './components/auth/Login';
-import Register from './components/auth/Register';
-import LoadingSpinner from './components/LoadingSpinner';
+import Visualization from './components/Visualization.jsx';
+import GreeksVisualization from './components/GreeksVisualization.jsx';
+import HistoricalDataVisualization from './components/HistoricalDataVisualization.jsx';
+import Navbar from './components/Navbar.jsx';
+import Login from './components/auth/Login.jsx';
+import Register from './components/auth/Register.jsx';
+import LoadingSpinner from './components/LoadingSpinner.jsx';
 import { AuthProvider, useAuth } from './contexts/AuthContext.jsx';
 
 const theme = createTheme({
