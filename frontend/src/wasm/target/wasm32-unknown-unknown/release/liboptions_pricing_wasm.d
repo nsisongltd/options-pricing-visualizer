@@ -1,0 +1,1 @@
+/mnt/c/projects/nsisonglabs/options-pricing-visualizer/frontend/src/wasm/target/wasm32-unknown-unknown/release/liboptions_pricing_wasm.rlib: /mnt/c/projects/nsisonglabs/options-pricing-visualizer/frontend/src/wasm/src/lib.rs
