@@ -121,5 +121,4 @@ seem the backend is having an issue
 
 `ps aux | grep node | cat`
 
-checked the servers and what is going on
-
+checked the servers and what is going on, and since both are running and even the frontend vite server is running
