@@ -130,8 +130,8 @@ wait! the backend is not responding o...even tho it is running.
 let me quickly add an healthcheck endpoint to the backend, i dont like stress:
 
 ```js
-// Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'Server is running' });
 });
 ```
+
