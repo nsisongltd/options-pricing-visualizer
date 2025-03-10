@@ -148,4 +148,4 @@ let me verify if both is running again: `curl http://localhost:5000/api/health |
 
 i think i know what is wrong.  let me fix the error in the frontend/src/contexts/AuthContext.js side of things. it just occured to me to rename the file `mv frontend/src/contexts/AuthContext.js frontend/src/contexts/AuthContext.jsx`
 
-having done that, let me update any imports that reference thi file atleast, make ah see clear. also, maybe other parts of the project even uses the shii. oh, navbar.js uses it sef,
+having done that, let me update any imports that reference thi file atleast, make ah see clear. also, maybe other parts of the project even uses the shii. oh, navbar.js uses it sef, as well as login.js and register.js, this makes sense.
