@@ -11,17 +11,10 @@ export default defineConfig({
     }
   },
   optimizeDeps: {
-    exclude: ['options_pricing_wasm']
+    exclude: ['**/options_pricing_wasm_bg.wasm']
   },
   build: {
-    target: 'esnext',
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          wasm: ['options_pricing_wasm']
-        }
-      }
-    }
+    target: 'esnext'
   },
   assetsInclude: ['**/*.wasm'],
   resolve: {
