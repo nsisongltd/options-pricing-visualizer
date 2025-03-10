@@ -6,7 +6,7 @@ const getAuthHeader = () => {
 };
 
 export const api = {
-  // Auth endpoints
+  // My Auth endpoints
   login: async (email, password) => {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
