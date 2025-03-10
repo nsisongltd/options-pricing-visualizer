@@ -144,3 +144,4 @@ had to stop the current servers, let me know what is wrong afresh...and now rest
 `cd backend && npm start`
 `cd frontend && npm run dev`
 
+let me verify if both is running again: `curl http://localhost:5000/api/health | cat`
