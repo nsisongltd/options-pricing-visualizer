@@ -141,5 +141,5 @@ let me check the frontend api config again, might have made mistakes. but this l
 pkill -f "node src/server.js" && pkill -f "vite"
 ```
 had to stop the current servers, let me know what is wrong afresh.
-
 `cd backend && npm start`
+`cd frontend && npm run dev`
