@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Box, Paper, Typography, Grid, Slider, TextField, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import * as d3 from 'd3';
 import { styled } from '@mui/material/styles';
-import init, { calculate_option_price } from '/wasm/options_pricing_wasm';
+import init, { calculate_option_price } from '/wasm/options_pricing_wasm.js';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(3),
