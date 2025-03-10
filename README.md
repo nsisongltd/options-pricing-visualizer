@@ -156,3 +156,6 @@ the loading spinner i added is even causing problems, irrelevant feature o.
 let me just rename all the component files then: `cd frontend/src/components && mv LoadingSpinner.js LoadingSpinner.jsx && mv Navbar.js Navbar.jsx && mv GreeksVisualization.js GreeksVisualization.jsx && mv HistoricalDataVisualization.js HistoricalDataVisualization.jsx && cd auth && mv Login.js Login.jsx && mv Register.js Register.jsx`
 
 will see any new errors that way, and updated the import statements in App.jsx. i also renamed the visualization component `cd frontend/src/components && mv Visualization.js Visualization.jsx`
+
+at this point, i will just build the webassembly module again and make sure wasm-pack is installed to avoid drama again: `curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh`
+
