@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Box, Paper, Typography, Grid, Slider, TextField, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import * as d3 from 'd3';
 import { styled } from '@mui/material/styles';
@@ -24,17 +24,8 @@ const ControlsContainer = styled(Box)(({ theme }) => ({
   marginBottom: theme.spacing(2),
 }));
 
-function Visualization() {
+function Visualization({ params, onParamsChange }) {
   const chartRef = useRef();
-  const [params, setParams] = useState({
-    spotPrice: 100,
-    strikePrice: 100,
-    timeToExpiry: 1,
-    volatility: 0.2,
-    riskFreeRate: 0.05,
-    optionType: 'call'
-  });
-  const [data, setData] = useState([]);
 
   useEffect(() => {
     const initWasm = async () => {
@@ -42,12 +33,11 @@ function Visualization() {
       updateChart();
     };
     initWasm();
-  }, []);
+  }, [params]);
 
   const updateChart = () => {
-    const newData = generateData();
-    setData(newData);
-    renderChart(newData);
+    const data = generateData();
+    renderChart(data);
   };
 
   const generateData = () => {
@@ -136,8 +126,7 @@ function Visualization() {
   };
 
   const handleParamChange = (param, value) => {
-    setParams(prev => ({ ...prev, [param]: value }));
-    updateChart();
+    onParamsChange({ ...params, [param]: value });
   };
 
   return (
