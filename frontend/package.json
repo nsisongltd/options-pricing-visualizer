@@ -195,6 +195,7 @@
     "queue-microtask": "^1.2.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.1",
     "react-scripts": "5.0.1",
     "read-cache": "^1.0.0",
     "readdirp": "^3.6.0",
@@ -243,7 +244,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "build:wasm": "cd src/wasm && wasm-pack build --target web",
+    "prebuild": "npm run build:wasm"
   },
   "keywords": [],
   "author": "",

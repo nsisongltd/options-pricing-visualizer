@@ -76,7 +76,7 @@ options-pricing-visualizer/
 npm run build
 ```
 
-## Testing
+## For All Testing
 
 ```bash
 # Run all tests
@@ -89,7 +89,7 @@ npm run test:frontend
 npm run test:backend
 ```
 
-## Contributing
+## If you want to contribute
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
@@ -100,3 +100,10 @@ npm run test:backend
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+
+# working it out
+Start the development servers:
+The application will be available at:
+Frontend: http://localhost:3000
+Backend: http://localhost:5000
