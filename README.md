@@ -168,3 +168,5 @@ with the way this is stressing me, i had to use my other macbook to load shii `p
 I think this issue is because I was trying to import the webassembly file directly from the `/public` directory o, and vite does not even allow it. omooor. i will just move the wasm files to the src directory and update the imports again.
 
 `cd frontend && mkdir -p src/wasm`
+
+Wo! I Created a new directory src/wasm-pkg and moved the WebAssembly files there. Then, Updated the Vite configuration to use the new wasm location jeje and excluded all .wasm files from optimization jare
