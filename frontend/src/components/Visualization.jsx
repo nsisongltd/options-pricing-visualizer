@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from 'react';
 import { Box, Paper, Typography, Grid, Slider, TextField, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import * as d3 from 'd3';
 import { styled } from '@mui/material/styles';
-import init, { calculate_option_price } from '@wasm/options_pricing_wasm.js';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(3),
@@ -26,14 +25,22 @@ const ControlsContainer = styled(Box)(({ theme }) => ({
 
 function Visualization({ params, onParamsChange }) {
   const chartRef = useRef();
+  const [wasmModule, setWasmModule] = React.useState(null);
 
   useEffect(() => {
     const initWasm = async () => {
-      await init();
-      updateChart();
+      try {
+        const wasmUrl = '/wasm/options_pricing_wasm.js';
+        const { default: init, calculate_option_price } = await import(/* @vite-ignore */ wasmUrl);
+        await init();
+        setWasmModule({ calculate_option_price });
+        updateChart();
+      } catch (error) {
+        console.error('Failed to initialize WebAssembly module:', error);
+      }
     };
     initWasm();
-  }, [params]);
+  }, []);
 
   const updateChart = () => {
     const data = generateData();
@@ -41,13 +48,14 @@ function Visualization({ params, onParamsChange }) {
   };
 
   const generateData = () => {
+    if (!wasmModule) return [];
     const data = [];
     const strikeRange = 40; // ±20 from spot price
     const steps = 41; // Number of points
 
     for (let i = 0; i < steps; i++) {
       const strike = params.spotPrice - strikeRange/2 + (strikeRange * i / (steps - 1));
-      const price = calculate_option_price({
+      const price = wasmModule.calculate_option_price({
         spot_price: params.spotPrice,
         strike_price: strike,
         time_to_expiry: params.timeToExpiry,
