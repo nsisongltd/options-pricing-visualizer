@@ -24,9 +24,10 @@ function App() {
     <div className='min-h-screen flex items-center justify-center bg-gray-900 text-white'>
       <div className='w-full max-w-2xl'>
         <h1 className='text-2xl font-bold mb-4'>Options Pricing Visualizer</h1>
+        <div id='chart'></div>
       </div>
     </div>
-  )
+  );
 
   return (
     <>
