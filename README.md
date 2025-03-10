@@ -125,4 +125,5 @@ checked the servers and what is going on, and since both are running and even th
 
 `curl http://localhost:5000/api/health | cat`
 
-wait! the backend is not responding o.
+wait! the backend is not responding o...even tho it is running.
+
