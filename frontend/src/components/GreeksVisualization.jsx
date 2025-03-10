@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Box, Paper, Typography, Grid, Tabs, Tab } from '@mui/material';
 import * as d3 from 'd3';
 import { styled } from '@mui/material/styles';
-import init, { calculate_option_price } from '/wasm/options_pricing_wasm.js';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(3),
@@ -21,20 +20,28 @@ function GreeksVisualization({ params }) {
   const chartRef = useRef();
   const [activeTab, setActiveTab] = useState(0);
   const [data, setData] = useState([]);
+  const [wasmModule, setWasmModule] = useState(null);
 
   useEffect(() => {
     const initWasm = async () => {
-      await init();
-      updateChart();
+      try {
+        const wasmUrl = '/wasm/options_pricing_wasm.js';
+        const { default: init, calculate_option_price } = await import(/* @vite-ignore */ wasmUrl);
+        await init();
+        setWasmModule({ calculate_option_price });
+        calculateGreeks();
+      } catch (error) {
+        console.error('Failed to initialize WebAssembly module:', error);
+      }
     };
     initWasm();
-  }, [params, activeTab]);
+  }, []);
 
   const calculateGreeks = (strike) => {
     const h = 0.01; // Small change for numerical differentiation
     
     // Calculate price at current point
-    const price = calculate_option_price({
+    const price = wasmModule.calculate_option_price({
       spot_price: params.spotPrice,
       strike_price: strike,
       time_to_expiry: params.timeToExpiry,
@@ -44,7 +51,7 @@ function GreeksVisualization({ params }) {
     });
 
     // Calculate price with small change in spot price (for Delta)
-    const priceSpotUp = calculate_option_price({
+    const priceSpotUp = wasmModule.calculate_option_price({
       spot_price: params.spotPrice + h,
       strike_price: strike,
       time_to_expiry: params.timeToExpiry,
@@ -54,7 +61,7 @@ function GreeksVisualization({ params }) {
     });
 
     // Calculate price with small change in time (for Theta)
-    const priceTimeUp = calculate_option_price({
+    const priceTimeUp = wasmModule.calculate_option_price({
       spot_price: params.spotPrice,
       strike_price: strike,
       time_to_expiry: params.timeToExpiry + h,
@@ -64,7 +71,7 @@ function GreeksVisualization({ params }) {
     });
 
     // Calculate price with small change in volatility (for Vega)
-    const priceVolUp = calculate_option_price({
+    const priceVolUp = wasmModule.calculate_option_price({
       spot_price: params.spotPrice,
       strike_price: strike,
       time_to_expiry: params.timeToExpiry,
@@ -75,7 +82,7 @@ function GreeksVisualization({ params }) {
 
     // Calculate Greeks
     const delta = (priceSpotUp - price) / h;
-    const gamma = ((priceSpotUp - price) / h - (price - calculate_option_price({
+    const gamma = ((priceSpotUp - price) / h - (price - wasmModule.calculate_option_price({
       spot_price: params.spotPrice - h,
       strike_price: strike,
       time_to_expiry: params.timeToExpiry,
