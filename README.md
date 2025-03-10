@@ -117,3 +117,9 @@ Log out securely
 Let me go and focus on the project itself.
 
 wait! wtf?!
+seem the backend is having an issue
+
+`ps aux | grep node | cat`
+
+checked the servers and what is going on
+
