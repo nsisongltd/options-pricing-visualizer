@@ -8,7 +8,7 @@ import Navbar from './components/Navbar';
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import LoadingSpinner from './components/LoadingSpinner';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext.jsx';
 
 const theme = createTheme({
   palette: {

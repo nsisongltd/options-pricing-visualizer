@@ -146,4 +146,4 @@ had to stop the current servers, let me know what is wrong afresh...and now rest
 
 let me verify if both is running again: `curl http://localhost:5000/api/health | cat`
 
-i think i know what is wrong.  let me fix the error in the frontend/src/contexts/AuthContext.js side of things
+i think i know what is wrong.  let me fix the error in the frontend/src/contexts/AuthContext.js side of things. it just occured to me to rename the file `mv frontend/src/contexts/AuthContext.js frontend/src/contexts/AuthContext.jsx`

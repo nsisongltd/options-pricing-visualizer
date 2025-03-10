@@ -13,7 +13,7 @@ import ShowChartIcon from '@mui/icons-material/ShowChart';
 import CalculateIcon from '@mui/icons-material/Calculate';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import LogoutIcon from '@mui/icons-material/Logout';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext.jsx';
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   display: 'flex',
