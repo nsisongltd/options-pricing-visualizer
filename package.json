@@ -1,0 +1,23 @@
+{
+  "name": "options-pricing-visualizer",
+  "version": "1.0.0",
+  "description": "Options Pricing Visualizer using WebAssembly for fast calculations",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
+    "start:frontend": "cd frontend && npm start",
+    "start:backend": "cd backend && npm start",
+    "build": "concurrently \"npm run build:frontend\" \"npm run build:backend\"",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "cd backend && npm run build",
+    "test": "concurrently \"npm run test:frontend\" \"npm run test:backend\"",
+    "test:frontend": "cd frontend && npm test",
+    "test:backend": "cd backend && npm test"
+  },
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "devDependencies": {
+    "prettier": "^3.1.1"
+  }
+}
