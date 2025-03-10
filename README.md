@@ -155,4 +155,4 @@ okay, fine. all fixed. let me restart all now: `pkill -f "vite" && cd frontend &
 the loading spinner i added is even causing problems, irrelevant feature o. 
 let me just rename all the component files then: `cd frontend/src/components && mv LoadingSpinner.js LoadingSpinner.jsx && mv Navbar.js Navbar.jsx && mv GreeksVisualization.js GreeksVisualization.jsx && mv HistoricalDataVisualization.js HistoricalDataVisualization.jsx && cd auth && mv Login.js Login.jsx && mv Register.js Register.jsx`
 
-will see any new errors that way, and updated the import statements in App.jsx
+will see any new errors that way, and updated the import statements in App.jsx. i also renamed the visualization component `cd frontend/src/components && mv Visualization.js Visualization.jsx`
