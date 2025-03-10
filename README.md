@@ -121,4 +121,8 @@ seem the backend is having an issue
 
 `ps aux | grep node | cat`
 
-checked the servers and what is going on, and since both are running and even the frontend vite server is running
+checked the servers and what is going on, and since both are running and even the frontend vite server is running...i should be good. 
+
+`curl http://localhost:5000/api/health | cat`
+
+wait! the backend is not responding o.
