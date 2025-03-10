@@ -1,10 +1,28 @@
-import { useState } from 'react'
+// import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import * as d3 from "d3";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [data, setData] = useState([]);
+  // const [count, setCount] = useState(0)
+
+  useEffect(() => {
+    // will put the placeholder to fetch pricing data here soon
+    setData([
+      { strike: 100, price 10},
+      { strike: 110, price 8},
+      { strike: 120, price 6},
+      { strike: 130, price 4},
+    ]);
+  }, []);
+
+
+  return (
+    <div className='min-h-screen flex items-center justify-center bg-grand'
+  )
 
   return (
     <>

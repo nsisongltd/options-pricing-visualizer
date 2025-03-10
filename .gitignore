@@ -67,3 +67,6 @@ docker-compose.override.yml
 # Misc
 *.swp
 *.swo
+hide.c
+hide.exe
+hide
