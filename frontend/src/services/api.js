@@ -48,18 +48,35 @@ export const api = {
   },
 
   // Get historical options data
-  getHistoricalData: async (symbol, startDate, endDate) => {
+  async getHistoricalData(symbol, startDate, endDate) {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/historical-data?symbol=${symbol}&startDate=${startDate}&endDate=${endDate}`
-      );
-      if (!response.ok) {
-        throw new Error('Failed to fetch historical data');
+      const response = await axios.get(`${API_BASE_URL}/historical-data`, {
+        params: {
+          symbol,
+          startDate,
+          endDate
+        },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (!response.data || !Array.isArray(response.data)) {
+        throw new Error('Invalid data format received from server');
       }
-      return await response.json();
+
+      return response.data;
     } catch (error) {
-      console.error('Error fetching historical data:', error);
-      throw error;
+      if (error.response) {
+        // Server responded with an error
+        throw new Error(error.response.data.message || 'Failed to fetch historical data');
+      } else if (error.request) {
+        // Request was made but no response received
+        throw new Error('No response from server. Please check your connection.');
+      } else {
+        // Something else went wrong
+        throw new Error('An error occurred while fetching historical data');
+      }
     }
   },
 

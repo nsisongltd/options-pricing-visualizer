@@ -1,5 +1,21 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Box, Paper, Typography, Grid, TextField, Button, CircularProgress } from '@mui/material';
+import {
+  Box,
+  Paper,
+  Typography,
+  Grid,
+  TextField,
+  Button,
+  CircularProgress,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Chip,
+  Alert
+} from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -32,11 +48,14 @@ function HistoricalDataVisualization({ params }) {
   const [loading, setLoading] = useState(false);
   const [historicalData, setHistoricalData] = useState([]);
   const [symbol, setSymbol] = useState('AAPL');
-  const [startDate, setStartDate] = useState(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)); // 30 days ago
+  const [startDate, setStartDate] = useState(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000));
   const [endDate, setEndDate] = useState(new Date());
+  const [error, setError] = useState(null);
+  const [dataSource, setDataSource] = useState('sample'); // 'sample' or 'market'
 
   const fetchHistoricalData = async () => {
     setLoading(true);
+    setError(null);
     try {
       const data = await api.getHistoricalData(
         symbol,
@@ -44,9 +63,11 @@ function HistoricalDataVisualization({ params }) {
         endDate.toISOString()
       );
       setHistoricalData(data);
+      setDataSource(data.length > 0 ? 'market' : 'sample');
       renderChart(data);
     } catch (error) {
       console.error('Error fetching historical data:', error);
+      setError('Failed to fetch data. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -125,9 +146,14 @@ function HistoricalDataVisualization({ params }) {
 
   return (
     <StyledPaper>
-      <Typography variant="h6" gutterBottom>
-        Historical Options Data
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography variant="h6">Historical Options Data</Typography>
+        <Chip
+          label={dataSource === 'market' ? 'Market Data' : 'Sample Data'}
+          color={dataSource === 'market' ? 'success' : 'warning'}
+          variant="outlined"
+        />
+      </Box>
       <ControlsContainer>
         <Grid container spacing={2} alignItems="center">
           <Grid item xs={12} sm={4}>
@@ -136,6 +162,7 @@ function HistoricalDataVisualization({ params }) {
               label="Symbol"
               value={symbol}
               onChange={(e) => setSymbol(e.target.value.toUpperCase())}
+              helperText="Try AAPL, GOOGL, MSFT, etc."
             />
           </Grid>
           <Grid item xs={12} sm={4}>
@@ -165,12 +192,46 @@ function HistoricalDataVisualization({ params }) {
               disabled={loading}
               startIcon={loading ? <CircularProgress size={20} /> : null}
             >
-              {loading ? 'Loading...' : 'Refresh Data'}
+              {loading ? 'Loading...' : 'Fetch Data'}
             </Button>
           </Grid>
         </Grid>
       </ControlsContainer>
+      
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
+
       <ChartContainer ref={chartRef} />
+
+      <TableContainer component={Paper} sx={{ mt: 2 }}>
+        <Table size="small">
+          <TableHead>
+            <TableRow>
+              <TableCell>Date</TableCell>
+              <TableCell>Symbol</TableCell>
+              <TableCell>Strike Price</TableCell>
+              <TableCell>Option Price</TableCell>
+              <TableCell>Volume</TableCell>
+              <TableCell>Type</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {historicalData.slice(0, 10).map((row, index) => (
+              <TableRow key={index}>
+                <TableCell>{new Date(row.timestamp).toLocaleDateString()}</TableCell>
+                <TableCell>{row.symbol}</TableCell>
+                <TableCell>${row.strike_price.toFixed(2)}</TableCell>
+                <TableCell>${row.price.toFixed(2)}</TableCell>
+                <TableCell>{row.volume.toLocaleString()}</TableCell>
+                <TableCell>{row.option_type}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </StyledPaper>
   );
 }
