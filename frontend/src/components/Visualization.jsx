@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Box, Paper, Typography, Grid, Slider, TextField, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import * as d3 from 'd3';
 import { styled } from '@mui/material/styles';
+import wasmInit, { calculate_option_price } from '../wasm-pkg/options_pricing_wasm';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(3),
@@ -30,8 +31,7 @@ function Visualization({ params, onParamsChange }) {
   useEffect(() => {
     const initWasm = async () => {
       try {
-        const { default: init, calculate_option_price } = await import('../wasm-pkg/options_pricing_wasm.js');
-        await init();
+        await wasmInit();
         setWasmModule({ calculate_option_price });
         updateChart();
       } catch (error) {

@@ -11,10 +11,13 @@ export default defineConfig({
     }
   },
   optimizeDeps: {
-    exclude: ['**/*.wasm']
+    exclude: ['options_pricing_wasm_bg.wasm']
   },
   build: {
-    target: 'esnext'
+    target: 'esnext',
+    rollupOptions: {
+      external: ['*.wasm']
+    }
   },
   assetsInclude: ['**/*.wasm'],
   resolve: {
