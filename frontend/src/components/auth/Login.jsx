@@ -9,16 +9,19 @@ import {
   Alert,
 } from '@mui/material';
 import { useAuth } from '../../contexts/AuthContext.jsx';
+import { useNavigate } from 'react-router-dom';
 
 function Login({ onToggleForm }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { login, error } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await login(email, password);
+      navigate('/');
     } catch (error) {
       console.error('Login error:', error);
     }

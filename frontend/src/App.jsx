@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Box, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Visualization from './components/Visualization.jsx';
 import GreeksVisualization from './components/GreeksVisualization.jsx';
 import HistoricalDataVisualization from './components/HistoricalDataVisualization.jsx';
@@ -28,20 +28,31 @@ const theme = createTheme({
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/login');
+    }
+  }, [user, loading, navigate]);
 
   if (loading) {
     return <LoadingSpinner />;
   }
 
-  if (!user) {
-    return <Navigate to="/login" />;
-  }
-
-  return children;
+  return user ? children : null;
 }
 
 function AuthPage() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
+
+  useEffect(() => {
+    if (user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
 
   return isLogin ? (
     <Login onToggleForm={() => setIsLogin(false)} />

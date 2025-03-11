@@ -11,27 +11,22 @@ import {
 import { useAuth } from '../../contexts/AuthContext.jsx';
 
 function Register({ onToggleForm }) {
-  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
-  const { register } = useAuth();
+  const [name, setName] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const { register, error } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
     try {
       await register(email, password, name);
-      onToggleForm(); // Switch to login form after successful registration
+      setSuccessMessage('Registration successful! Please log in.');
+      setTimeout(() => {
+        onToggleForm();
+      }, 1500);
     } catch (error) {
-      setError(error.message || 'Registration failed');
+      console.error('Registration error:', error);
     }
   };
 
@@ -62,6 +57,11 @@ function Register({ onToggleForm }) {
             {error}
           </Alert>
         )}
+        {successMessage && (
+          <Alert severity="success" sx={{ mb: 2 }}>
+            {successMessage}
+          </Alert>
+        )}
         <form onSubmit={handleSubmit}>
           <TextField
             fullWidth
@@ -86,15 +86,6 @@ function Register({ onToggleForm }) {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            margin="normal"
-            required
-          />
-          <TextField
-            fullWidth
-            label="Confirm Password"
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
             margin="normal"
             required
           />
