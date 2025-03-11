@@ -175,4 +175,4 @@ I need to join work meeting, right now.
 
 Okay, i woke up with fresh eyes and i have fixed the authentication system. I will continue later. Sorry, I lied. I am pumped up, and I want to implement real market data right now. So we can get historical data fully.
 
-Although I am thinking I should use sample data, to test functionality before I start using real market data.
+Although I am thinking I should use sample data, to test functionality before I start using real market data. i like to get things done straight. I will use Yahoo Finance for this.

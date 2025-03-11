@@ -298,22 +298,59 @@ function generateSampleData(symbol, startDate, endDate) {
   return data;
 }
 
-// Historical data endpoints
+// Yahoo Finance API integration
+async function fetchMarketData(symbol, startDate, endDate) {
+  try {
+    const response = await fetch(
+      `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?period1=${Math.floor(new Date(startDate).getTime() / 1000)}&period2=${Math.floor(new Date(endDate).getTime() / 1000)}&interval=1d`
+    );
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch market data for ${symbol}`);
+    }
+
+    const data = await response.json();
+    
+    if (!data.chart?.result?.[0]?.indicators?.quote?.[0]) {
+      throw new Error(`No market data available for ${symbol}`);
+    }
+
+    const timestamps = data.chart.result[0].timestamp;
+    const quotes = data.chart.result[0].indicators.quote[0];
+    const adjClose = data.chart.result[0].indicators.adjclose?.[0]?.adjclose || quotes.close;
+    
+    return timestamps.map((timestamp, i) => ({
+      symbol,
+      strike_price: Number(adjClose[i] || quotes.close[i]).toFixed(2),
+      expiration_date: new Date(timestamp * 1000 + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      option_type: 'call',
+      price: Number(quotes.close[i]).toFixed(2),
+      volume: quotes.volume[i] || 0,
+      timestamp: new Date(timestamp * 1000).toISOString()
+    })).filter(item => item.price && item.strike_price);
+  } catch (error) {
+    console.error('Error fetching market data:', error);
+    throw new Error(`Failed to fetch market data: ${error.message}`);
+  }
+}
+
+// Historical data endpoint
 app.get('/api/historical-data', authenticateToken, async (req, res) => {
   const { symbol, startDate, endDate } = req.query;
 
-  try {
-    // First, try to get real market data
-    let marketData = [];
-    try {
-      marketData = await fetchMarketData(symbol, startDate, endDate);
-    } catch (error) {
-      console.log('Falling back to sample data:', error.message);
-    }
+  if (!symbol || !startDate || !endDate) {
+    return res.status(400).json({ 
+      error: 'Missing required parameters. Please provide symbol, startDate, and endDate.' 
+    });
+  }
 
-    // If no market data, use sample data
+  try {
+    const marketData = await fetchMarketData(symbol, startDate, endDate);
+    
     if (!marketData || marketData.length === 0) {
-      marketData = generateSampleData(symbol, startDate, endDate);
+      return res.status(404).json({ 
+        error: `No market data available for ${symbol} in the specified date range.` 
+      });
     }
 
     // Store the data in the database
@@ -334,44 +371,12 @@ app.get('/api/historical-data', authenticateToken, async (req, res) => {
     });
 
     await Promise.all(insertPromises);
-
-    // Return the data
     res.json(marketData);
   } catch (error) {
     console.error('Error handling historical data:', error);
-    res.status(500).json({ error: 'Failed to fetch historical data' });
+    res.status(500).json({ error: error.message });
   }
 });
-
-// Yahoo Finance API integration
-async function fetchMarketData(symbol, startDate, endDate) {
-  try {
-    const response = await fetch(
-      `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?period1=${Math.floor(new Date(startDate).getTime() / 1000)}&period2=${Math.floor(new Date(endDate).getTime() / 1000)}&interval=1d`
-    );
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch market data');
-    }
-
-    const data = await response.json();
-    const timestamps = data.chart.result[0].timestamp;
-    const quotes = data.chart.result[0].indicators.quote[0];
-    
-    return timestamps.map((timestamp, i) => ({
-      symbol,
-      strike_price: quotes.close[i],
-      expiration_date: new Date(timestamp * 1000 + 30 * 24 * 60 * 60 * 1000).toISOString(),
-      option_type: 'call',
-      price: quotes.close[i],
-      volume: quotes.volume[i],
-      timestamp: new Date(timestamp * 1000).toISOString()
-    }));
-  } catch (error) {
-    console.error('Error fetching market data:', error);
-    throw error;
-  }
-}
 
 // Error handling middleware
 app.use((err, req, res, next) => {
